@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARMELA ONLINE | كارميلا أونلاين</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            pink: '#e6007e',
+                            navy: '#0b2545',
+                            gold: '#f2a900'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; scroll-behavior: smooth; }
+        @keyframes pulse-once {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); color: #e6007e; }
+            100% { transform: scale(1); }
+        }
+        .animate-pulse-once {
+            animation: pulse-once 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Top Policy Bar -->
+    <div class="bg-brand-pink text-white text-xs sm:text-sm font-bold py-2.5 text-center px-4 shadow-sm">
+        <span><i class="fa-solid fa-truck-fast ml-1"></i> الشحن متوفر عن طريق شركة البحر الأحمر للشحن | الاستبدال والاسترجاع خلال 48 ساعة</span>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-pink-100">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            
+            <a href="javascript:void(0)" onclick="showPage('home')" class="flex items-center gap-3">
+                <span class="text-xl font-black text-brand-navy tracking-wide">CARMELA ONLINE</span>
+            </a>
+
+            <nav class="hidden md:flex gap-6 font-semibold text-gray-600 text-sm">
+                <a href="javascript:void(0)" onclick="showPage('home')" class="text-brand-pink hover:text-pink-700">الرئيسية</a>
+                <a href="javascript:void(0)" onclick="goToHomeAndFilter('الكل')" class="hover:text-brand-pink">جميع المنتجات</a>
+                <a href="javascript:void(0)" onclick="goToHomeAndFilter('ملابس')" class="hover:text-brand-pink">ملابس وفساتين</a>
+                <a href="javascript:void(0)" onclick="goToHomeAndFilter('إكسسوارات')" class="hover:text-brand-pink">إكسسوارات</a>
+                <a href="javascript:void(0)" onclick="goToHomeAndFilter('منظفات وأدوات منزلية')" class="hover:text-brand-pink">منظفات وأدوات منزلية</a>
+                <a href="javascript:void(0)" onclick="goToHomeAndFilter('متاح')" class="hover:text-brand-pink">المتاح فوراً</a>
+                <a href="javascript:void(0)" onclick="showPage('policy-page')" class="hover:text-brand-pink">سياسة الشحن</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <button id="cartBtn" class="relative text-gray-600 hover:text-brand-pink p-2 transition-colors">
+                    <i id="cartIconAnim" class="fa-solid fa-bag-shopping text-2xl"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-brand-pink text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN HOME PAGE CONTAINER -->
+    <div id="homePage">
+        <!-- Hero Banner with Background Image -->
+        <section class="relative text-white py-24 px-4 overflow-hidden bg-cover bg-center" style="background-image: linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.85)), url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&auto=format&fit=crop&q=80');">
+            <div class="relative max-w-7xl mx-auto flex flex-col items-start gap-6">
+                <span class="bg-brand-pink text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full text-white shadow">متوفر قطع وتسليم فوري + حجز مسبق</span>
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">شياكتك ومنزلك الراقي يصلك أينما كنتِ <br>مع CARMELA ONLINE</h1>
+                <p class="text-gray-200 max-w-lg text-lg">نرسل لكِ أحدث الملابس، الإكسسوارات، والمنظفات والأدوات المنزلية عبر شركة البحر الأحمر للشحن.</p>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="goToHomeAndFilter('الكل')" class="bg-brand-pink hover:bg-pink-700 text-white font-bold px-8 py-3 rounded-lg transition-all shadow-lg hover:shadow-pink-500/50">تصفحي المنتجات</button>
+                    <button onclick="goToHomeAndFilter('متاح')" class="bg-white hover:bg-gray-100 text-brand-navy font-bold px-8 py-3 rounded-lg transition-all shadow-lg">عرض المتاح فوراً فقط</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Policy Cards Section -->
+        <section class="bg-white border-b py-10">
+            <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="flex items-center justify-center gap-4 p-5 rounded-xl bg-pink-50 border border-pink-100 shadow-sm">
+                    <i class="fa-solid fa-truck-ramp-box text-3xl text-brand-pink"></i>
+                    <div class="text-right">
+                        <h4 class="font-bold text-base text-brand-navy">شركة البحر الأحمر للشحن</h4>
+                        <p class="text-xs text-gray-600">تحدد مصاريف الشحن حسب المكان والوزن عند التوصيل</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-4 p-5 rounded-xl bg-pink-50 border border-pink-100 shadow-sm">
+                    <i class="fa-solid fa-rotate-left text-3xl text-brand-pink"></i>
+                    <div class="text-right">
+                        <h4 class="font-bold text-base text-brand-navy">استبدال أو استرجاع خلال 48 ساعة</h4>
+                        <p class="text-xs text-gray-600">يمكنك طلب الاستبدال أو الإرجاع خلال 48 ساعة من استلام الطلب</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-4 p-5 rounded-xl bg-pink-50 border border-pink-100 shadow-sm">
+                    <i class="fa-solid fa-receipt text-3xl text-brand-pink"></i>
+                    <div class="text-right">
+                        <h4 class="font-bold text-base text-brand-navy">رسوم الشحن</h4>
+                        <p class="text-xs text-gray-600">يتحمل العميل مصاريف الشحن الخاصة بشركة التوصيل</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="max-w-7xl mx-auto px-4 py-16 scroll-mt-20">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+                <div>
+                    <h2 id="sectionTitle" class="text-3xl font-extrabold text-gray-900">جميع منتجات المتجر</h2>
+                    <p class="text-gray-500 mt-1">تصفحي القطع المتاحة أو احجزي قطعة حجزاً مسبقاً</p>
+                </div>
+                <div class="flex flex-wrap gap-2" id="filterContainer">
+                    <button onclick="filterProducts('الكل')" id="btn-all" class="filter-btn px-4 py-2 text-sm bg-brand-pink text-white font-bold rounded-lg shadow-sm">الكل</button>
+                    <button onclick="filterProducts('ملابس')" id="btn-clothes" class="filter-btn px-4 py-2 text-sm bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300">ملابس وفساتين</button>
+                    <button onclick="filterProducts('إكسسوارات')" id="btn-accessories" class="filter-btn px-4 py-2 text-sm bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300">إكسسوارات</button>
+                    <button onclick="filterProducts('منظفات وأدوات منزلية')" id="btn-home" class="filter-btn px-4 py-2 text-sm bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300">منظفات وأدوات منزلية</button>
+                    <button onclick="filterAvailableOnly()" id="btn-available" class="filter-btn px-4 py-2 text-sm bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300">المتاح فوراً فقط</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="productsGrid"></div>
+        </section>
+    </div>
+
+    <!-- SEPARATE POLICY PAGE CONTAINER -->
+    <div id="policyPage" class="hidden max-w-4xl mx-auto px-4 py-16">
+        <div class="bg-white border border-pink-100 rounded-2xl p-8 shadow-sm">
+            <div class="text-center mb-10">
+                <span class="bg-pink-100 text-brand-pink text-xs font-bold px-3 py-1 rounded-full uppercase">سياسة المتجر الرسمية</span>
+                <h2 class="text-3xl font-extrabold text-brand-navy mt-2">شروط وسياسة الشحن والاستبدال والاسترجاع</h2>
+                <p class="text-gray-500 text-sm mt-1">نحرص على راحتك وضمان حصولكِ على أفضل تجربة تسوق معنا</p>
+            </div>
+
+            <div class="space-y-8">
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+                    <div class="flex items-center gap-3 text-brand-navy">
+                        <i class="fa-solid fa-truck-fast text-2xl text-brand-pink"></i>
+                        <h3 class="font-bold text-lg">تفاصيل وقواعد الشحن</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
+                            <span>يتم شحن جميع الطلبات عن طريق <b>شركة البحر الأحمر للشحن</b> لضمان سرعة وأمان التوصيل.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
+                            <span>تحديد قيمة ومصاريف الشحن يتم بواسطة شركة التوصيل بناءً على <b>المدينة والمحافظة ومكان الاستلام</b>.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
+                            <span>يتحمل العميل الكريم تكلفة مصاريف الشحن الخاصة بشركة التوصيل عند استلام الطلب أو في حال الإرجاع والبدل.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+                    <div class="flex items-center gap-3 text-brand-navy">
+                        <i class="fa-solid fa-arrow-rotate-left text-2xl text-brand-pink"></i>
+                        <h3 class="font-bold text-lg">سياسة الاستبدال والاسترجاع</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
+                            <span>متاح الاستبدال أو الاسترجاع خلال <b>48 ساعة فقط</b> من تاريخ استلام الطلب.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
+                            <span>يجب أن يكون المنتج بحالته الأصلية، وفي غلافه، وغير مستخدم أو مغسول.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
+                            <span>في حالات البدل أو الإرجاع، يتحمل العميل تكلفة الشحن الخاصة بشركة البحر الأحمر للشحن.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button onclick="showPage('home')" class="bg-brand-navy text-white font-bold px-6 py-2.5 rounded-lg hover:bg-brand-pink transition-colors">
+                    <i class="fa-solid fa-arrow-right ml-1"></i> العودة إلى التسوق وتصفح المنتجات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 transition-opacity">
+        <div class="fixed inset-y-0 left-0 max-w-full flex">
+            <div class="w-screen max-w-md bg-white p-6 flex flex-col justify-between shadow-xl overflow-y-auto">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-4">
+                        <h3 class="text-xl font-bold text-brand-navy">سلة الشراء - CARMELA ONLINE</h3>
+                        <button id="closeCart" onclick="toggleCartModal(false)" class="text-gray-500 hover:text-black">
+                            <i class="fa-solid fa-xmark text-2xl"></i>
+                        </button>
+                    </div>
+
+                    <div id="cartItems" class="divide-y divide-gray-200 my-4 max-h-[28vh] overflow-y-auto"></div>
+
+                    <!-- Customer Form -->
+                    <form id="checkoutForm" onsubmit="event.preventDefault(); checkout();" class="mt-4 border-t pt-4 space-y-3">
+                        <h4 class="font-bold text-brand-navy text-sm"><i class="fa-solid fa-user-pen text-brand-pink ml-1"></i> بيانات الشحن والتوصيل:</h4>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">الاسم بالكامل *</label>
+                            <input type="text" id="customerName" required placeholder="أدخلي اسمكِ بالكامل" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">رقم الهاتف (واتساب) *</label>
+                            <input type="tel" id="customerPhone" required placeholder="01xxxxxxxxx" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">المحافظة / المدينة *</label>
+                            <input type="text" id="customerCity" required placeholder="مثال: الغردقة، سفاجا..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">العنوان بالتفصيل *</label>
+                            <textarea id="customerAddress" required rows="2" placeholder="اسم الشارع - رقم العمارة" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="border-t pt-4 space-y-3 mt-4">
+                    <div class="bg-gray-50 p-3 rounded-lg text-xs space-y-2 border border-gray-200">
+                        <div class="flex justify-between text-base font-extrabold text-brand-pink">
+                            <span>مجموع القطع المطلوبة:</span>
+                            <span id="cartTotal">0.00 ج.م</span>
+                        </div>
+                        <div class="text-[11px] text-gray-500 bg-amber-50 border border-amber-200 p-2 rounded text-right">
+                            <i class="fa-solid fa-circle-info text-amber-600 ml-1"></i>
+                            <strong>تنويه الشحن:</strong> يتم تحديد قيمة الشحن وتكلفتها بواسطة <b>شركة البحر الأحمر للشحن</b> عند التأكيد.
+                        </div>
+                    </div>
+
+                    <button onclick="checkout()" class="w-full bg-brand-pink text-white font-bold py-3 rounded-lg hover:bg-pink-700 transition-all shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> تأكيد وإرسال الطلب عبر واتساب
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-brand-navy text-gray-400 py-10 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <a href="javascript:void(0)" onclick="showPage('home')" class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl font-black text-white">CARMELA ONLINE</span>
+                </a>
+                <p class="text-sm">متجرك الإلكتروني للأزياء والملابس النسائية والإكسسوارات والمنظفات والأدوات المنزلية مع خدمة شحن عن طريق شركة البحر الأحمر للشحن.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4">سياسة الشحن والإرجاع</h4>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-pink"></i> الشحن يتم عن طريق شركة البحر الأحمر للشحن.</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-pink"></i> الاستبدال والاسترجاع خلال 48 ساعة فقط.</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-pink"></i> يتحمل العميل مصاريف الشحن للشركة عند الإرجاع أو البدل.</li>
+                    <li><a href="javascript:void(0)" onclick="showPage('policy-page')" class="text-brand-pink hover:underline font-bold mt-1 inline-block"><i class="fa-solid fa-arrow-left ml-1"></i> قراءة تفاصيل السياسة كاملة</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4">الدفع والتواصل</h4>
+                <div class="flex gap-4 text-2xl text-gray-300 mb-4">
+                    <i class="fa-brands fa-cc-visa"></i>
+                    <i class="fa-brands fa-cc-mastercard"></i>
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <p class="text-xs text-gray-500">جميع الحقوق محفوظة © CARMELA ONLINE.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let defaultProducts = [
+            { id: 1, name: "فستان سهرة راقي أنيق", category: "ملابس", price: 650, stock: 3, image: "images/p1.jpg.jpeg", rating: 4.9 },
+            { id: 2, name: "فستان كاجوال صيفي ناعم", category: "ملابس", price: 420, stock: 0, image: "images/p2.jpg.jpeg", rating: 4.8 },
+            { id: 3, name: "طقم رياضي نسائي مريح", category: "ملابس", price: 380, stock: 5, image: "images/p3.jpg.jpeg", rating: 4.7 },
+            { id: 4, name: "حقيبة يد جلدية فاخرة", category: "إكسسوارات", price: 290, stock: 2, image: "images/p4.jpg.jpeg", rating: 4.9 },
+            { id: 5, name: "نظارة شمسية أنيقة مميزة", category: "إكسسوارات", price: 180, stock: 0, image: "images/p5.jpg.jpeg", rating: 4.6 },
+            { id: 6, name: "سوار وحلي نسائي فاخر", category: "إكسسوارات", price: 150, stock: 4, image: "images/p6.jpg.jpeg", rating: 4.8 },
+            { id: 7, name: "تيشيرت كاجوال قطن عصري", category: "ملابس", price: 220, stock: 1, image: "images/p7.jpg.jpeg", rating: 4.7 },
+            { id: 8, name: "وشاح وحجاب شيفون راقي", category: "إكسسوارات", price: 120, stock: 0, image: "images/p8.jpg.jpeg", rating: 4.5 },
+            { id: 9, name: "سائل منظف ومطهر مركز للمنزل", category: "منظفات وأدوات منزلية", price: 95, stock: 10, image: "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=400&auto=format&fit=crop&q=80", rating: 4.8 },
+            { id: 10, name: "طقم أدوات مطبخ سيليكون مانعة للالتصاق", category: "منظفات وأدوات منزلية", price: 250, stock: 4, image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&auto=format&fit=crop&q=80", rating: 4.9 }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('carmela_products')) || defaultProducts;
+        let cart = [];
+        let currentFilter = 'الكل';
+
+        function showPage(pageId) {
+            const homePage = document.getElementById('homePage');
+            const policyPage = document.getElementById('policyPage');
+
+            if (pageId === 'home') {
+                homePage.classList.remove('hidden');
+                policyPage.classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (pageId === 'policy-page') {
+                homePage.classList.add('hidden');
+                policyPage.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function goToHomeAndFilter(category) {
+            const homePage = document.getElementById('homePage');
+            const policyPage = document.getElementById('policyPage');
+
+            homePage.classList.remove('hidden');
+            policyPage.classList.add('hidden');
+
+            if (category === 'متاح') {
+                filterAvailableOnly();
+            } else {
+                filterProducts(category);
+            }
+
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const titleElem = document.getElementById('sectionTitle');
+            if(!grid) return;
+
+            let filtered = products;
+            if (currentFilter === 'ملابس') {
+                filtered = products.filter(p => p.category === 'ملابس');
+                titleElem.textContent = "قسم الملابس والفساتين";
+            } else if (currentFilter === 'إكسسوارات') {
+                filtered = products.filter(p => p.category === 'إكسسوارات');
+                titleElem.textContent = "قسم الإكسسوارات";
+            } else if (currentFilter === 'منظفات وأدوات منزلية') {
+                filtered = products.filter(p => p.category === 'منظفات وأدوات منزلية');
+                titleElem.textContent = "قسم المنظفات والأدوات المنزلية";
+            } else if (currentFilter === 'متاح') {
+                filtered = products.filter(p => p.stock > 0);
+                titleElem.textContent = "المنتجات المتاحة للتسليم الفوري فقط";
+            } else {
+                titleElem.textContent = "جميع منتجات المتجر";
+            }
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn px-4 py-2 text-sm bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300";
+            });
+
+            if (currentFilter === 'الكل') document.getElementById('btn-all').className = "filter-btn px-4 py-2 text-sm bg-brand-pink text-white font-bold rounded-lg shadow-sm";
+            if (currentFilter === 'ملابس') document.getElementById('btn-clothes').className = "filter-btn px-4 py-2 text-sm bg-brand-pink text-white font-bold rounded-lg shadow-sm";
+            if (currentFilter === 'إكسسوارات') document.getElementById('btn-accessories').className = "filter-btn px-4 py-2 text-sm bg-brand-pink text-white font-bold rounded-lg shadow-sm";
+            if (currentFilter === 'منظفات وأدوات منزلية') document.getElementById('btn-home').className = "filter-btn px-4 py-2 text-sm bg-brand-pink text-white font-bold rounded-lg shadow-sm";
+            if (currentFilter === 'متاح') document.getElementById('btn-available').className = "filter-btn px-4 py-2 text-sm bg-brand-pink text-white font-bold rounded-lg shadow-sm";
+
+            grid.innerHTML = filtered.map(product => {
+                const isAvailable = product.stock > 0;
+                
+                const badgeHtml = isAvailable 
+                    ? `<span class="bg-green-100 text-green-700 border border-green-200 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"><i class="fa-solid fa-check ml-1"></i>متوفر بالمخزون (${product.stock})</span>`
+                    : `<span class="bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"><i class="fa-solid fa-clock ml-1"></i>متاح للحجز المسبق</span>`;
+
+                const buttonHtml = isAvailable
+                    ? `<button id="btn-prod-${product.id}" onclick="addToCart(${product.id})" class="w-full bg-brand-navy hover:bg-brand-pink text-white text-sm font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cart-plus"></i> إضافة للسلة (تسليم فوري)
+                       </button>`
+                    : `<button id="btn-prod-${product.id}" onclick="addToCart(${product.id})" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calendar-check"></i> احجزي الآن (حجز مسبق)
+                       </button>`;
+
+                return `
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-64 bg-gray-100 overflow-hidden">
+                                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&auto=format&fit=crop&q=80';">
+                                <span class="absolute top-3 right-3 bg-white text-xs font-bold px-2 py-1 rounded shadow text-brand-pink">${product.category}</span>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="flex items-center text-yellow-400 text-xs">
+                                        <i class="fa-solid fa-star"></i>
+                                        <span class="text-gray-600 font-semibold mr-1">${product.rating || 5.0}</span>
+                                    </div>
+                                    ${badgeHtml}
+                                </div>
+                                <h3 class="font-bold text-gray-800 text-base mb-2">${product.name}</h3>
+                                <p class="text-brand-pink font-extrabold text-lg">${product.price} ج.م</p>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0">
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterProducts(category) {
+            currentFilter = category;
+            renderProducts();
+        }
+
+        function filterAvailableOnly() {
+            currentFilter = 'متاح';
+            renderProducts();
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const item = cart.find(c => c.id === productId);
+            
+            if (item) {
+                item.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1, isPreOrder: product.stock <= 0 });
+            }
+            updateCart();
+
+            const cartIcon = document.getElementById('cartIconAnim');
+            cartIcon.classList.add('animate-pulse-once');
+            setTimeout(() => cartIcon.classList.remove('animate-pulse-once'), 500);
+
+            toggleCartModal(true);
+
+            const btnElem = document.getElementById(`btn-prod-${productId}`);
+            if (btnElem) {
+                const originalContent = btnElem.innerHTML;
+                const originalClass = btnElem.className;
+
+                btnElem.innerHTML = `<i class="fa-solid fa-circle-check"></i> تمت الإضافة للسلة ✓`;
+                btnElem.className = "w-full bg-green-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2";
+
+                setTimeout(() => {
+                    btnElem.innerHTML = originalContent;
+                    btnElem.className = originalClass;
+                }, 1200);
+            }
+        }
+
+        function changeQuantity(productId, delta) {
+            const item = cart.find(c => c.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(c => c.id !== productId);
+                }
+            }
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const subTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            if(cartCount) cartCount.textContent = totalItems;
+            if(cartTotal) cartTotal.textContent = `${subTotal} ج.م`;
+
+            if (cartItems) {
+                if (cart.length === 0) {
+                    cartItems.innerHTML = `<p class="text-center text-gray-500 py-8">سلة الشراء فارغة حالياً.</p>`;
+                } else {
+                    cartItems.innerHTML = cart.map(item => `
+                        <div class="flex items-center justify-between py-3">
+                            <div class="flex items-center gap-3">
+                                <img src="${item.image}" class="w-12 h-12 object-cover rounded" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&auto=format&fit=crop&q=80';">
+                                <div>
+                                    <h4 class="font-bold text-sm">${item.name}</h4>
+                                    <p class="text-xs text-brand-pink font-bold">${item.price} ج.م</p>
+                                    ${item.isPreOrder ? '<span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded mt-1">حجز مسبق</span>' : '<span class="inline-block bg-green-100 text-green-800 text-[10px] font-bold px-1.5 py-0.5 rounded mt-1">تسليم فوري</span>'}
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+                                    <button type="button" onclick="changeQuantity(${item.id}, -1)" class="px-2.5 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">-</button>
+                                    <span class="px-3 text-xs font-bold">${item.quantity}</span>
+                                    <button type="button" onclick="changeQuantity(${item.id}, 1)" class="px-2.5 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function toggleCartModal(show) {
+            const modal = document.getElementById('cartModal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function checkout() {
+            let name = document.getElementById('customerName').value;
+            let phone = document.getElementById('customerPhone').value;
+            let city = document.getElementById('customerCity').value;
+            let address = document.getElementById('customerAddress').value;
+
+            if(!name || !phone || !city || !address) {
+                alert('الرجاء إكمال كافة بيانات الشحن والتوصيل في السلة');
+                return;
+            }
+
+            let text = `مرحباً CARMELA ONLINE، أرغب في تأكيد الطلب التالي:%0A`;
+            text += `*الاسم:* ${name}%0A*الهاتف:* ${phone}%0A*المدينة:* ${city}%0A*العنوان:* ${address}%0A%0A*المنتجات المطلوبة:*%0A`;
+            cart.forEach(i => { text += `- ${i.name} (${i.quantity} قطعة) - ${i.price * i.quantity} ج.م%0A`; });
+            let total = cart.reduce((a,b) => a + (b.price * b.quantity), 0);
+            text += `%0A*الإجمالي:* ${total} ج.م (يضاف إليه مصاريف شحن شركة البحر الأحمر)`;
+
+            window.open(`https://wa.me/201000000000?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>

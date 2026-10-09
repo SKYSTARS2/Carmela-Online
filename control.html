@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | CARMELA ONLINE</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-md p-6 sm:p-8">
+        <div class="flex justify-between items-center border-b pb-4 mb-6">
+            <h1 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-sliders text-pink-600 ml-2"></i> لوحة تحكم متجر كارميلا أونلاين</h1>
+            <a href="index.html" target="_blank" class="bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-slate-700">عرض المتجر <i class="fa-solid fa-external-link-alt mr-1"></i></a>
+        </div>
+
+        <!-- Add Product Form -->
+        <form id="productForm" onsubmit="saveProduct(event)" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4">
+            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد أو قطعة جديدة</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">اسم المنتج *</label>
+                    <input type="text" id="pName" required placeholder="مثال: فستان راقي مطرز" class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">السعر (جنيه مصري) *</label>
+                    <input type="number" id="pPrice" required placeholder="500" class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">القسم *</label>
+                    <select id="pCategory" class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
+                        <option value="ملابس">ملابس وفساتين</option>
+                        <option value="إكسسوارات">إكسسوارات</option>
+                        <option value="منظفات وأدوات منزلية">منظفات وأدوات منزلية</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">الكمية بالمخزون (0 تعني حجز مسبق) *</label>
+                    <input type="number" id="pStock" required value="3" class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (من جهازك أو هاتفك مباشرة) *</label>
+                <input type="file" id="pImageFile" accept="image/*" class="w-full border rounded-lg p-2 text-sm bg-white">
+            </div>
+
+            <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl transition-colors shadow">
+                حفظ وإضافة المنتج للمتجر فوراً
+            </button>
+        </form>
+
+        <!-- Current Products List -->
+        <div>
+            <h2 class="font-bold text-slate-800 text-lg mb-4">المنتجات الحالية في المتجر</h2>
+            <div id="adminProductsList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <script>
+        let defaultProducts = [
+            { id: 1, name: "فستان سهرة راقي أنيق", category: "ملابس", price: 650, stock: 3, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", rating: 4.9 },
+            { id: 2, name: "فستان كاجوال صيفي ناعم", category: "ملابس", price: 420, stock: 0, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", rating: 4.8 },
+            { id: 3, name: "طقم رياضي نسائي مريح", category: "ملابس", price: 380, stock: 5, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", rating: 4.7 },
+            { id: 4, name: "حقيبة يد جلدية فاخرة", category: "إكسسوارات", price: 290, stock: 2, image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&q=80", rating: 4.9 },
+            { id: 5, name: "نظارة شمسية أنيقة مميزة", category: "إكسسوارات", price: 180, stock: 0, image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&q=80", rating: 4.6 },
+            { id: 6, name: "سوار وحلي نسائي فاخر", category: "إكسسوارات", price: 150, stock: 4, image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&q=80", rating: 4.8 },
+            { id: 7, name: "تيشيرت كاجوال قطن عصري", category: "ملابس", price: 220, stock: 1, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", rating: 4.7 },
+            { id: 8, name: "وشاح وحجاب شيفون راقي", category: "إكسسوارات", price: 120, stock: 0, image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&q=80", rating: 4.5 },
+            { id: 9, name: "سائل منظف ومطهر مركز للمنزل", category: "منظفات وأدوات منزلية", price: 95, stock: 10, image: "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?w=400&q=80", rating: 4.8 },
+            { id: 10, name: "طقم أدوات مطبخ سيليكون مانعة للالتصاق", category: "منظفات وأدوات منزلية", price: 250, stock: 4, image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&q=80", rating: 4.9 }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('carmela_products')) || defaultProducts;
+
+        function renderAdminList() {
+            const list = document.getElementById('adminProductsList');
+            if(products.length === 0) {
+                list.innerHTML = `<p class="text-gray-500 text-center py-4">لا توجد منتجات مسجلة حالياً.</p>`;
+                return;
+            }
+
+            list.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between bg-white border p-3 rounded-xl shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.image}" class="w-14 h-14 object-cover rounded-lg border" onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&q=80'">
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-800">${p.name}</h4>
+                            <p class="text-xs text-pink-600 font-bold">${p.price} ج.م | <span class="text-gray-500">${p.category}</span></p>
+                        </div>
+                    </div>
+                    <button onclick="deleteProduct(${p.id})" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                        <i class="fa-solid fa-trash ml-1"></i> حذف
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('pName').value;
+            const price = parseFloat(document.getElementById('pPrice').value);
+            const category = document.getElementById('pCategory').value;
+            const stock = parseInt(document.getElementById('pStock').value);
+            const fileInput = document.getElementById('pImageFile');
+
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    addProductObj(name, price, category, stock, event.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                addProductObj(name, price, category, stock, "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80");
+            }
+        }
+
+        function addProductObj(name, price, category, stock, image) {
+            const newProduct = {
+                id: Date.now(),
+                name, price, category, stock, image,
+                rating: 5.0
+            };
+            products.unshift(newProduct);
+            localStorage.setItem('carmela_products', JSON.stringify(products));
+            alert('تم إضافة المنتج بنجاح وتحديث المتجر!');
+            document.getElementById('productForm').reset();
+            renderAdminList();
+        }
+
+        function deleteProduct(id) {
+            if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('carmela_products', JSON.stringify(products));
+                renderAdminList();
+            }
+        }
+
+        renderAdminList();
+    </script>
+</body>
+</html>
