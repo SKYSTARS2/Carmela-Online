@@ -514,7 +514,7 @@
                                 <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
                                     <button type="button" onclick="changeQuantity(${item.id}, -1)" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">-</button>
                                     <span class="px-3 text-xs font-bold">${item.quantity}</span>
-                                    <button type="button" onclick="changeQuantity(${item.id}, 1)" class="px-2.5 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">+</button>
+                                    <button type="button" onclick="changeQuantity(${item.id}, 1)" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">+</button>
                                 </div>
                             </div>
                         </div>
@@ -533,18 +533,22 @@
             let city = document.getElementById('customerCity').value;
             let address = document.getElementById('customerAddress').value;
 
-            let text = `مرحباً CARMELA ONLINE، أرغب في تأكيد الطلب التالي:\n`;
-            text += `*الاسم:* ${name}\n*الهاتف:* ${phone}\n*المدينة:* ${city}\n*العنوان:* ${address}\n\n*المنتجات المطلوبة:*\n`;
+            let text = "مرحباً CARMELA ONLINE، أرغب في تأكيد الطلب التالي:\n";
+            text += "*الاسم:* " + name + "\n";
+            text += "*الهاتف:* " + phone + "\n";
+            text += "*المدينة:* " + city + "\n";
+            text += "*العنوان:* " + address + "\n\n";
+            text += "*المنتجات المطلوبة:*\n";
             
             cart.forEach(i => { 
                 let typeText = i.isPreOrder ? '(حجز مسبق)' : '(تسليم فوري)';
-                text += `- ${i.name} [${typeText}] (${i.quantity} قطعة) - ${i.price * i.quantity} ج.م\n`; 
+                text += "- " + i.name + " " + typeText + " (" + i.quantity + " قطعة) - " + (i.price * i.quantity) + " ج.م\n"; 
             });
 
             let total = cart.reduce((a,b) => a + (b.price * b.quantity), 0);
-            text += `\n*الإجمالي:* ${total} ج.م (يضاف إليه مصاريف شحن شركة البحر الأحمر)`;
+            text += "\n*الإجمالي:* " + total + " ج.م (يضاف إليه مصاريف شحن شركة البحر الأحمر)";
 
-            window.open(`https://wa.me/201068894113?text=${encodeURIComponent(text)}`, '_blank');
+            window.open('https://wa.me/201000000000?text=' + encodeURIComponent(text), '_blank');
         }
 
         renderProducts();
