@@ -49,7 +49,7 @@
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             
             <a href="javascript:void(0)" onclick="showPage('home')" class="flex items-center gap-3">
-                <span class="text-xl font-black text-brand-navy tracking-wide">CARMELA ONLINE</span>
+                <span class="text-xl font-black text-brand-navy hidden sm:inline tracking-wide">CARMELA ONLINE</span>
             </a>
 
             <nav class="hidden md:flex gap-6 font-semibold text-gray-600 text-sm">
@@ -63,7 +63,7 @@
             </nav>
 
             <div class="flex items-center gap-4">
-                <button id="cartBtn" class="relative text-gray-600 hover:text-brand-pink p-2 transition-colors">
+                <button id="cartBtn" onclick="toggleCartModal(true)" class="relative text-gray-600 hover:text-brand-pink p-2 transition-colors">
                     <i id="cartIconAnim" class="fa-solid fa-bag-shopping text-2xl"></i>
                     <span id="cartCount" class="absolute -top-1 -right-1 bg-brand-pink text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
                 </button>
@@ -89,6 +89,7 @@
         <!-- Policy Cards Section -->
         <section class="bg-white border-b py-10">
             <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                
                 <div class="flex items-center justify-center gap-4 p-5 rounded-xl bg-pink-50 border border-pink-100 shadow-sm">
                     <i class="fa-solid fa-truck-ramp-box text-3xl text-brand-pink"></i>
                     <div class="text-right">
@@ -112,6 +113,7 @@
                         <p class="text-xs text-gray-600">يتحمل العميل مصاريف الشحن الخاصة بشركة التوصيل</p>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -135,7 +137,7 @@
         </section>
     </div>
 
-    <!-- SEPARATE POLICY PAGE CONTAINER -->
+    <!-- SEPARATE POLICY PAGE CONTAINER (Hidden by default) -->
     <div id="policyPage" class="hidden max-w-4xl mx-auto px-4 py-16">
         <div class="bg-white border border-pink-100 rounded-2xl p-8 shadow-sm">
             <div class="text-center mb-10">
@@ -145,6 +147,7 @@
             </div>
 
             <div class="space-y-8">
+                <!-- Shipping Details -->
                 <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
                     <div class="flex items-center gap-3 text-brand-navy">
                         <i class="fa-solid fa-truck-fast text-2xl text-brand-pink"></i>
@@ -157,7 +160,7 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
-                            <span>تحديد قيمة ومصاريف الشحن يتم بواسطة شركة التوصيل بناءً على <b>المدينة والمحافظة ومكان الاستلام</b>.</span>
+                            <span>تحديد قيمة ومصاريف الشحن يتم بواسطة شركة التوصيل بناءً على **المدينة والمحافظة ومكان الاستلام**.</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
@@ -166,6 +169,7 @@
                     </ul>
                 </div>
 
+                <!-- Return & Exchange Details -->
                 <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
                     <div class="flex items-center gap-3 text-brand-navy">
                         <i class="fa-solid fa-arrow-rotate-left text-2xl text-brand-pink"></i>
@@ -174,7 +178,7 @@
                     <ul class="space-y-3 text-sm text-gray-700">
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
-                            <span>متاح الاستبدال أو الاسترجاع خلال <b>48 ساعة فقط</b> من تاريخ استلام الطلب.</span>
+                            <span>متاح الاستبدال أو الاسترجاع خلال **48 ساعة فقط** من تاريخ استلام الطلب.</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
@@ -197,13 +201,13 @@
     </div>
 
     <!-- Shopping Cart Modal -->
-    <div id="cartModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 transition-opacity">
+    <div id="cartModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 transition-opacity" onclick="if(event.target === this) toggleCartModal(false);">
         <div class="fixed inset-y-0 left-0 max-w-full flex">
             <div class="w-screen max-w-md bg-white p-6 flex flex-col justify-between shadow-xl overflow-y-auto">
                 <div>
                     <div class="flex justify-between items-center border-b pb-4">
                         <h3 class="text-xl font-bold text-brand-navy">سلة الشراء - CARMELA ONLINE</h3>
-                        <button id="closeCart" onclick="toggleCartModal(false)" class="text-gray-500 hover:text-black">
+                        <button onclick="toggleCartModal(false)" class="text-gray-500 hover:text-black p-2">
                             <i class="fa-solid fa-xmark text-2xl"></i>
                         </button>
                     </div>
@@ -226,13 +230,15 @@
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">المحافظة / المدينة *</label>
-                            <input type="text" id="customerCity" required placeholder="مثال: الغردقة، سفاجا..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink">
+                            <input type="text" id="customerCity" required placeholder="مثال: الغردقة، سفاجا، القصير..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">العنوان بالتفصيل *</label>
-                            <textarea id="customerAddress" required rows="2" placeholder="اسم الشارع - رقم العمارة" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink"></textarea>
+                            <textarea id="customerAddress" required rows="2" placeholder="اسم الشارع - رقم العمارة - أي علامة مميزة" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:border-brand-pink"></textarea>
                         </div>
+                        
+                        <button type="submit" id="submitBtn" class="hidden"></button>
                     </form>
                 </div>
 
@@ -248,7 +254,7 @@
                         </div>
                     </div>
 
-                    <button onclick="checkout()" class="w-full bg-brand-pink text-white font-bold py-3 rounded-lg hover:bg-pink-700 transition-all shadow-md flex items-center justify-center gap-2">
+                    <button onclick="triggerSubmit()" class="w-full bg-brand-pink text-white font-bold py-3 rounded-lg hover:bg-pink-700 transition-all shadow-md flex items-center justify-center gap-2">
                         <i class="fa-brands fa-whatsapp text-lg"></i> تأكيد وإرسال الطلب عبر واتساب
                     </button>
                 </div>
@@ -394,7 +400,7 @@
                                 <div class="flex justify-between items-center mb-2">
                                     <div class="flex items-center text-yellow-400 text-xs">
                                         <i class="fa-solid fa-star"></i>
-                                        <span class="text-gray-600 font-semibold mr-1">${product.rating || 5.0}</span>
+                                        <span class="text-gray-600 font-semibold mr-1">${product.rating}</span>
                                     </div>
                                     ${badgeHtml}
                                 </div>
@@ -418,6 +424,15 @@
         function filterAvailableOnly() {
             currentFilter = 'متاح';
             renderProducts();
+        }
+
+        function toggleCartModal(show) {
+            const modal = document.getElementById('cartModal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
         }
 
         function addToCart(productId) {
@@ -457,9 +472,15 @@
             if (item) {
                 item.quantity += delta;
                 if (item.quantity <= 0) {
-                    cart = cart.filter(c => c.id !== productId);
+                    removeFromCart(productId);
+                    return;
                 }
             }
+            updateCart();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(c => c.id !== productId);
             updateCart();
         }
 
@@ -491,7 +512,7 @@
                             
                             <div class="flex items-center gap-2">
                                 <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
-                                    <button type="button" onclick="changeQuantity(${item.id}, -1)" class="px-2.5 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">-</button>
+                                    <button type="button" onclick="changeQuantity(${item.id}, -1)" class="px-2 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">-</button>
                                     <span class="px-3 text-xs font-bold">${item.quantity}</span>
                                     <button type="button" onclick="changeQuantity(${item.id}, 1)" class="px-2.5 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">+</button>
                                 </div>
@@ -502,13 +523,8 @@
             }
         }
 
-        function toggleCartModal(show) {
-            const modal = document.getElementById('cartModal');
-            if (show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
+        function triggerSubmit() {
+            document.getElementById('submitBtn').click();
         }
 
         function checkout() {
@@ -517,16 +533,16 @@
             let city = document.getElementById('customerCity').value;
             let address = document.getElementById('customerAddress').value;
 
-            if(!name || !phone || !city || !address) {
-                alert('الرجاء إكمال كافة بيانات الشحن والتوصيل في السلة');
-                return;
-            }
+            let text = `مرحباً CARMELA ONLINE، أرغب في تأكيد الطلب التالي:\n`;
+            text += `*الاسم:* ${name}\n*الهاتف:* ${phone}\n*المدينة:* ${city}\n*العنوان:* ${address}\n\n*المنتجات المطلوبة:*\n`;
+            
+            cart.forEach(i => { 
+                let typeText = i.isPreOrder ? '(حجز مسبق)' : '(تسليم فوري)';
+                text += `- ${i.name} [${typeText}] (${i.quantity} قطعة) - ${i.price * i.quantity} ج.م\n`; 
+            });
 
-            let text = `مرحباً CARMELA ONLINE، أرغب في تأكيد الطلب التالي:%0A`;
-            text += `*الاسم:* ${name}%0A*الهاتف:* ${phone}%0A*المدينة:* ${city}%0A*العنوان:* ${address}%0A%0A*المنتجات المطلوبة:*%0A`;
-            cart.forEach(i => { text += `- ${i.name} (${i.quantity} قطعة) - ${i.price * i.quantity} ج.م%0A`; });
             let total = cart.reduce((a,b) => a + (b.price * b.quantity), 0);
-            text += `%0A*الإجمالي:* ${total} ج.م (يضاف إليه مصاريف شحن شركة البحر الأحمر)`;
+            text += `\n*الإجمالي:* ${total} ج.م (يضاف إليه مصاريف شحن شركة البحر الأحمر)`;
 
             window.open(`https://wa.me/201068894113?text=${encodeURIComponent(text)}`, '_blank');
         }
