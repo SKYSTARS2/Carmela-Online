@@ -16,19 +16,19 @@
             <a href="index.html" target="_blank" class="bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-slate-700">عرض المتجر <i class="fa-solid fa-external-link-alt mr-1"></i></a>
         </div>
 
-        <!-- إعدادات الاتصال بجيت هاب (توضع مرة واحدة) -->
+        <!-- إعدادات الربط -->
         <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6 space-y-3">
-            <h3 class="font-bold text-blue-900 text-sm"><i class="fa-solid fa-gear ml-1"></i> إعدادات الربط السحابي (توضع مرة واحدة):</h3>
+            <h3 class="font-bold text-blue-900 text-sm"><i class="fa-solid fa-gear ml-1"></i> إعدادات الاتصال المباشر بجيت هاب:</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input type="text" id="ghUser" placeholder="اسم المستخدم على جيت هاب (Username)" class="border rounded-lg p-2 text-xs bg-white">
+                <input type="text" id="ghUser" value="skystars2" placeholder="اسم المستخدم (skystars2)" class="border rounded-lg p-2 text-xs bg-white">
                 <input type="password" id="ghToken" placeholder="رمز الأمان GitHub Token (ghp_...)" class="border rounded-lg p-2 text-xs bg-white">
             </div>
-            <p class="text-[11px] text-blue-700">اكتبهم مرة واحدة، وهيتم حفظهم في المتصفح عشان اللوحة تحدث ملف `products.json` على جيت هاب أوتوماتيك.</p>
+            <p class="text-[11px] text-blue-700">اكتب الـ Token مرة واحدة وسيحفظ تلقائياً في المتصفح.</p>
         </div>
 
         <!-- Add Product Form -->
         <form id="productForm" onsubmit="saveProduct(event)" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4">
-            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد أو قطعة جديدة</h2>
+            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد (رفع مباشر للصورة)</h2>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -54,8 +54,8 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (رابط مباشر للصورة) *</label>
-                <input type="url" id="pImage" required placeholder="https://images.unsplash.com/..." class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
+                <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (اختر صورة من جهازك أو هافك) *</label>
+                <input type="file" id="pImageFile" accept="image/*" class="w-full border rounded-lg p-2 text-sm bg-white">
             </div>
 
             <button type="submit" id="submitBtn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl transition-colors shadow">
@@ -73,11 +73,10 @@
     </div>
 
     <script>
-        const REPO_NAME = 'CarmelaOnline';
+        const REPO_NAME = 'Carmela-Online';
         let products = [];
-        let fileSha = ''; // خاص بجيت هاب لتحديث الملفات
+        let fileSha = '';
 
-        // استرجاع بيانات الإعدادات المخزنة محلياً لسهولة الاستخدام
         window.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('gh_user')) document.getElementById('ghUser').value = localStorage.getItem('gh_user');
             if(localStorage.getItem('gh_token')) document.getElementById('ghToken').value = localStorage.getItem('gh_token');
@@ -85,8 +84,9 @@
         });
 
         async function loadProductsFromGitHub() {
+            const user = document.getElementById('ghUser').value.trim() || 'skystars2';
             try {
-                const res = await fetch(`https://api.github.com/repos/CarmelaOnline/CarmelaOnline/contents/products.json`);
+                const res = await fetch(`https://api.github.com/repos/${user}/${REPO_NAME}/contents/products.json`);
                 if(res.ok) {
                     const data = await res.json();
                     fileSha = data.sha;
@@ -94,15 +94,12 @@
                     products = decodedContent;
                     renderAdminList();
                 } else {
-                    // لو الملف مش موجود لسه، بنعمل قائمة افتراضية
-                    products = [
-                        { id: 1, name: "فستان سهرة راقي أنيق", category: "ملابس", price: 650, stock: 3, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", rating: 4.9 }
-                    ];
+                    products = [];
                     renderAdminList();
                 }
             } catch(err) {
                 console.error(err);
-                document.getElementById('adminProductsList').innerHTML = `<p class="text-red-500 text-center">خطأ في الاتصال بجيت هاب.</p>`;
+                document.getElementById('adminProductsList').innerHTML = `<p class="text-red-500 text-center">تأكد من وجود ملف products.json في جيت هاب.</p>`;
             }
         }
 
@@ -111,17 +108,16 @@
             const token = document.getElementById('ghToken').value.trim();
 
             if(!user || !token) {
-                alert('من فضلك أدخل اسم المستخدم على جيت هاب ورمز الأمان (Token) في الأعلى أولاً!');
+                alert('يرجى كتابة اسم المستخدم ورمز الأمان (Token) في الخانات الزرقاء فوق أولاً!');
                 return false;
             }
 
-            // حفظهم للمرة القادمة
             localStorage.setItem('gh_user', user);
             localStorage.setItem('gh_token', token);
 
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = 'جاري النشر وتحديث الموقع للجميع... ⏳';
+            btn.textContent = 'جاري رفع المنتج والصورة للموقع... ⏳';
 
             try {
                 const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
@@ -142,13 +138,13 @@
                 if(response.ok) {
                     const resData = await response.json();
                     fileSha = resData.content.sha;
-                    alert('تم النشر بنجاح! الموقع اتحدث لكل الناس في ثواني 🚀');
+                    alert('تم إضافة المنتج بنجاح ونشره للجميع على الموقع! 🚀');
                     btn.disabled = false;
                     btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
                     return true;
                 } else {
                     const errData = await response.json();
-                    alert('حدث خطأ في النشر: ' + errData.message);
+                    alert('خطأ أثناء الحفظ: ' + errData.message);
                     btn.disabled = false;
                     btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
                     return false;
@@ -184,14 +180,26 @@
             `).join('');
         }
 
-        async function saveProduct(e) {
+        function saveProduct(e) {
             e.preventDefault();
             const name = document.getElementById('pName').value;
             const price = parseFloat(document.getElementById('pPrice').value);
             const category = document.getElementById('pCategory').value;
             const stock = parseInt(document.getElementById('pStock').value);
-            const image = document.getElementById('pImage').value;
+            const fileInput = document.getElementById('pImageFile');
 
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = async function(event) {
+                    await addProductObj(name, price, category, stock, event.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                addProductObj(name, price, category, stock, "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80");
+            }
+        }
+
+        async function addProductObj(name, price, category, stock, image) {
             const newProduct = {
                 id: Date.now(),
                 name, price, category, stock, image,
@@ -205,12 +213,12 @@
                 document.getElementById('productForm').reset();
                 renderAdminList();
             } else {
-                products.shift(); // لو فشل النرجع المنتج محلياً
+                products.shift();
             }
         }
 
         async function deleteProduct(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المنتج ونشره للجميع؟')) {
+            if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
                 const oldProducts = [...products];
                 products = products.filter(p => p.id !== id);
                 
