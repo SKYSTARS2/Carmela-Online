@@ -128,7 +128,6 @@
 
             const reader = new FileReader();
             reader.onload = async function(event) {
-                // ضغط الصورة لتناسب قواعد البيانات بدون مشاكل حجم
                 const img = new Image();
                 img.onload = async function() {
                     const canvas = document.createElement('canvas');
@@ -170,18 +169,4 @@
         };
 
         window.deleteCloudProduct = async function(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المنتج نهائياً للجميع؟')) {
-                try {
-                    await deleteDoc(doc(db, "products", id));
-                    loadProductsFromCloud();
-                } catch(err) {
-                    alert('خطأ أثناء الحذف');
-                }
-            }
-        };
-
-        // تحميل المنتجات عند فتح الصفحة
-        loadProductsFromCloud();
-    </script>
-</body>
-</html>
+            if(confirm('هل أنت متأكد
