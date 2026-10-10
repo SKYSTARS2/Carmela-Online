@@ -12,18 +12,18 @@
 <body class="bg-gray-100 min-h-screen p-4 sm:p-8">
     <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
         <div class="flex justify-between items-center border-b pb-4 mb-6">
-            <h1 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-cloud-arrow-up text-pink-600 ml-2"></i> لوحة تحكم كارميلا (السحابية المباشرة)</h1>
+            <h1 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-cloud-arrow-up text-pink-600 ml-2"></i> لوحة تحكم كارميلا</h1>
             <a href="index.html" target="_blank" class="bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-slate-700">عرض المتجر <i class="fa-solid fa-external-link-alt mr-1"></i></a>
         </div>
 
-        <!-- Add Product Form -->
-        <form id="productForm" onsubmit="saveProductToCloud(event)" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4">
-            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد (يظهر للجميع فوراً)</h2>
+        <!-- Form -->
+        <form id="productForm" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4">
+            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد</h2>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">اسم المنتج *</label>
-                    <input type="text" id="pName" required placeholder="مثال: فستان راقي مطرز" class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
+                    <input type="text" id="pName" required placeholder="مثال: فستان راقي" class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">السعر (جنيه مصري) *</label>
@@ -44,7 +44,7 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (اختر صورة من جهازك) *</label>
+                <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج *</label>
                 <input type="file" id="pImageFile" accept="image/*" required class="w-full border rounded-lg p-2 text-sm bg-white">
             </div>
 
@@ -57,12 +57,12 @@
         <div>
             <h2 class="font-bold text-slate-800 text-lg mb-4">المنتجات الحالية على السحابة</h2>
             <div id="adminProductsList" class="space-y-3">
-                <p class="text-gray-500 text-center py-4">جاري تحميل المنتجات من السحابة...</p>
+                <p class="text-gray-500 text-center py-4">جاري تحميل المنتجات...</p>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs via CDN -->
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -80,7 +80,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.loadProductsFromCloud = async function() {
+        async function loadProducts() {
             const list = document.getElementById('adminProductsList');
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
@@ -101,7 +101,7 @@
                                     <p class="text-xs text-pink-600 font-bold">${p.price} ج.م | <span class="text-gray-500">${p.category}</span></p>
                                 </div>
                             </div>
-                            <button onclick="deleteCloudProduct('${docSnap.id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                            <button onclick="deleteProduct('${docSnap.id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
                                 <i class="fa-solid fa-trash ml-1"></i> حذف
                             </button>
                         </div>
@@ -110,21 +110,39 @@
                 list.innerHTML = html;
             } catch (err) {
                 console.error(err);
-                list.innerHTML = `<p class="text-red-500 text-center">خطأ في الاتصال بقاعدة بيانات السحابة.</p>`;
+                list.innerHTML = `<p class="text-red-500 text-center">خطأ في الاتصال بقاعدة البيانات: ${err.message}</p>`;
+            }
+        }
+
+        window.deleteProduct = async function(id) {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                try {
+                    await deleteDoc(doc(db, "products", id));
+                    loadProducts();
+                } catch(err) {
+                    alert('خطأ أثناء الحذف: ' + err.message);
+                }
             }
         };
 
-        window.saveProductToCloud = async function(e) {
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = 'جاري ضغط الصورة والرفع للسحابة... ⏳';
+            btn.textContent = 'جاري الرفع... ⏳';
 
             const name = document.getElementById('pName').value;
             const price = parseFloat(document.getElementById('pPrice').value);
             const category = document.getElementById('pCategory').value;
             const stock = parseInt(document.getElementById('pStock').value);
             const fileInput = document.getElementById('pImageFile');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('يرجى اختيار صورة أولاً');
+                btn.disabled = false;
+                btn.textContent = 'حفظ ونشر المنتج أونلاين للجميع 🚀';
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = async function(event) {
@@ -133,7 +151,7 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxDim = 500;
+                    const maxDim = 400;
                     if (width > height && width > maxDim) {
                         height *= maxDim / width;
                         width = maxDim;
@@ -145,7 +163,7 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const compressedImage = canvas.toDataURL('image/jpeg', 0.6);
+                    const compressedImage = canvas.toDataURL('image/jpeg', 0.5);
 
                     try {
                         await addDoc(collection(db, "products"), {
@@ -153,11 +171,12 @@
                             image: compressedImage,
                             createdAt: Date.now()
                         });
-                        alert('تم رفع ونشر المنتج للجميع بنجاح على السحابة! 🚀');
+                        alert('تم نشر المنتج بنجاح! 🎉');
                         document.getElementById('productForm').reset();
-                        loadProductsFromCloud();
+                        loadProducts();
                     } catch (err) {
-                        alert('حدث خطأ أثناء الحفظ: ' + err.message);
+                        console.error(err);
+                        alert('فشل الرفع: ' + err.message);
                     } finally {
                         btn.disabled = false;
                         btn.textContent = 'حفظ ونشر المنتج أونلاين للجميع 🚀';
@@ -166,7 +185,9 @@
                 img.src = event.target.result;
             };
             reader.readAsDataURL(fileInput.files[0]);
-        };
+        });
 
-        window.deleteCloudProduct = async function(id) {
-            if(confirm('هل أنت متأكد
+        loadProducts();
+    </script>
+</body>
+</html>
