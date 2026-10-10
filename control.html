@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم المطورة | CARMELA ONLINE</title>
+    <title>لوحة التحكم | CARMELA ONLINE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,17 +12,23 @@
 <body class="bg-gray-100 min-h-screen p-4 sm:p-8">
     <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
         <div class="flex justify-between items-center border-b pb-4 mb-6">
-            <h1 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-sliders text-pink-600 ml-2"></i> لوحة تحكم كارميلا أونلاين (المتطورة)</h1>
+            <h1 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-sliders text-pink-600 ml-2"></i> لوحة تحكم متجر كارميلا أونلاين</h1>
             <a href="index.html" target="_blank" class="bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-slate-700">عرض المتجر <i class="fa-solid fa-external-link-alt mr-1"></i></a>
         </div>
 
-        <div id="statusMsg" class="mb-4 p-3 rounded-lg text-xs font-bold text-center bg-blue-50 text-blue-700 border border-blue-200">
-            جاري الاتصال بالسيرفر السحابي...
+        <!-- إعدادات الاتصال بجيت هاب (توضع مرة واحدة) -->
+        <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6 space-y-3">
+            <h3 class="font-bold text-blue-900 text-sm"><i class="fa-solid fa-gear ml-1"></i> إعدادات الربط السحابي (توضع مرة واحدة):</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input type="text" id="ghUser" placeholder="اسم المستخدم على جيت هاب (Username)" class="border rounded-lg p-2 text-xs bg-white">
+                <input type="password" id="ghToken" placeholder="رمز الأمان GitHub Token (ghp_...)" class="border rounded-lg p-2 text-xs bg-white">
+            </div>
+            <p class="text-[11px] text-blue-700">اكتبهم مرة واحدة، وهيتم حفظهم في المتصفح عشان اللوحة تحدث ملف `products.json` على جيت هاب أوتوماتيك.</p>
         </div>
 
         <!-- Add Product Form -->
-        <form id="productForm" onsubmit="saveProduct(event)" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4 shadow-sm">
-            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد (يظهر للجميع فوراً)</h2>
+        <form id="productForm" onsubmit="saveProduct(event)" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4">
+            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد أو قطعة جديدة</h2>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -42,24 +48,24 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">الكمية بالمخزون (0 = حجز مسبق) *</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">الكمية بالمخزون (0 تعني حجز مسبق) *</label>
                     <input type="number" id="pStock" required value="3" class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (رابط مباشر أو رفع) *</label>
-                <input type="file" id="pImageFile" accept="image/*" class="w-full border rounded-lg p-2 text-sm bg-white">
+                <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (رابط مباشر للصورة) *</label>
+                <input type="url" id="pImage" required placeholder="https://images.unsplash.com/..." class="w-full border rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-pink-600">
             </div>
 
             <button type="submit" id="submitBtn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl transition-colors shadow">
-                حفظ ونشر التعديل للجميع فوراً
+                حفظ ونشر التعديل للجميع فوراً 🚀
             </button>
         </form>
 
         <!-- Current Products List -->
         <div>
-            <h2 class="font-bold text-slate-800 text-lg mb-4">المنتجات الحالية على السيرفر</h2>
+            <h2 class="font-bold text-slate-800 text-lg mb-4">المنتجات الحالية في المتجر</h2>
             <div id="adminProductsList" class="space-y-3">
                 <p class="text-gray-500 text-center py-4">جاري تحميل المنتجات...</p>
             </div>
@@ -67,12 +73,155 @@
     </div>
 
     <script>
-        const BIN_ID = '672b10a4ae36879e95082103'; // بن مجعي خاص بمتجرك
-        const API_KEY = '$2a$10$7v2t5V1Y6Y8Z...'; // سيتم مزامנתها عبر سكريبت موحد
+        const REPO_NAME = 'CarmelaOnline';
+        let products = [];
+        let fileSha = ''; // خاص بجيت هاب لتحديث الملفات
 
-        // للتبسيط التام والسرعة بدون تعقيد مفاتيح، سنستخدم GitHub Gist أو LocalStorage مدعوم بـ GitHub API، 
-        // أو أبسط حل: ملف JSON يتم تحديثه أوتوماتيك عبر سكربت بسيط.
-        // بما أنك على جيت هاب، سنربط اللوحة بـ GitHub مباشرة أو خدمة تخزين مجانية سريعة.
+        // استرجاع بيانات الإعدادات المخزنة محلياً لسهولة الاستخدام
+        window.addEventListener('DOMContentLoaded', () => {
+            if(localStorage.getItem('gh_user')) document.getElementById('ghUser').value = localStorage.getItem('gh_user');
+            if(localStorage.getItem('gh_token')) document.getElementById('ghToken').value = localStorage.getItem('gh_token');
+            loadProductsFromGitHub();
+        });
+
+        async function loadProductsFromGitHub() {
+            try {
+                const res = await fetch(`https://api.github.com/repos/CarmelaOnline/CarmelaOnline/contents/products.json`);
+                if(res.ok) {
+                    const data = await res.json();
+                    fileSha = data.sha;
+                    const decodedContent = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    products = decodedContent;
+                    renderAdminList();
+                } else {
+                    // لو الملف مش موجود لسه، بنعمل قائمة افتراضية
+                    products = [
+                        { id: 1, name: "فستان سهرة راقي أنيق", category: "ملابس", price: 650, stock: 3, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", rating: 4.9 }
+                    ];
+                    renderAdminList();
+                }
+            } catch(err) {
+                console.error(err);
+                document.getElementById('adminProductsList').innerHTML = `<p class="text-red-500 text-center">خطأ في الاتصال بجيت هاب.</p>`;
+            }
+        }
+
+        async function saveProductsToGitHub() {
+            const user = document.getElementById('ghUser').value.trim();
+            const token = document.getElementById('ghToken').value.trim();
+
+            if(!user || !token) {
+                alert('من فضلك أدخل اسم المستخدم على جيت هاب ورمز الأمان (Token) في الأعلى أولاً!');
+                return false;
+            }
+
+            // حفظهم للمرة القادمة
+            localStorage.setItem('gh_user', user);
+            localStorage.setItem('gh_token', token);
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'جاري النشر وتحديث الموقع للجميع... ⏳';
+
+            try {
+                const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
+                
+                const response = await fetch(`https://api.github.com/repos/${user}/${REPO_NAME}/contents/products.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: "Update products via Carmela Control Panel",
+                        content: contentEncoded,
+                        sha: fileSha
+                    })
+                });
+
+                if(response.ok) {
+                    const resData = await response.json();
+                    fileSha = resData.content.sha;
+                    alert('تم النشر بنجاح! الموقع اتحدث لكل الناس في ثواني 🚀');
+                    btn.disabled = false;
+                    btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
+                    return true;
+                } else {
+                    const errData = await response.json();
+                    alert('حدث خطأ في النشر: ' + errData.message);
+                    btn.disabled = false;
+                    btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
+                    return false;
+                }
+            } catch(err) {
+                alert('خطأ في الاتصال بالشبكة.');
+                btn.disabled = false;
+                btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
+                return false;
+            }
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('adminProductsList');
+            if(products.length === 0) {
+                list.innerHTML = `<p class="text-gray-500 text-center py-4">لا توجد منتجات مسجلة حالياً.</p>`;
+                return;
+            }
+
+            list.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between bg-white border p-3 rounded-xl shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.image}" class="w-14 h-14 object-cover rounded-lg border" onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&q=80'">
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-800">${p.name}</h4>
+                            <p class="text-xs text-pink-600 font-bold">${p.price} ج.م | <span class="text-gray-500">${p.category}</span></p>
+                        </div>
+                    </div>
+                    <button onclick="deleteProduct(${p.id})" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                        <i class="fa-solid fa-trash ml-1"></i> حذف
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function saveProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('pName').value;
+            const price = parseFloat(document.getElementById('pPrice').value);
+            const category = document.getElementById('pCategory').value;
+            const stock = parseInt(document.getElementById('pStock').value);
+            const image = document.getElementById('pImage').value;
+
+            const newProduct = {
+                id: Date.now(),
+                name, price, category, stock, image,
+                rating: 5.0
+            };
+
+            products.unshift(newProduct);
+            
+            const success = await saveProductsToGitHub();
+            if(success) {
+                document.getElementById('productForm').reset();
+                renderAdminList();
+            } else {
+                products.shift(); // لو فشل النرجع المنتج محلياً
+            }
+        }
+
+        async function deleteProduct(id) {
+            if(confirm('هل أنت متأكد من حذف هذا المنتج ونشره للجميع؟')) {
+                const oldProducts = [...products];
+                products = products.filter(p => p.id !== id);
+                
+                const success = await saveProductsToGitHub();
+                if(success) {
+                    renderAdminList();
+                } else {
+                    products = oldProducts;
+                }
+            }
+        }
     </script>
 </body>
 </html>
