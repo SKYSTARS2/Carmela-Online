@@ -63,9 +63,6 @@
             </nav>
 
             <div class="flex items-center gap-4">
-                <a href="control.html" target="_blank" class="text-xs bg-pink-50 text-brand-pink border border-pink-200 px-3 py-1.5 rounded-lg font-bold hover:bg-pink-100 transition-colors">
-                    <i class="fa-solid fa-gear ml-1"></i> لوحة التحكم
-                </a>
                 <button id="cartBtn" onclick="toggleCartModal(true)" class="relative text-gray-600 hover:text-brand-pink p-2 transition-colors">
                     <i id="cartIconAnim" class="fa-solid fa-bag-shopping text-2xl"></i>
                     <span id="cartCount" class="absolute -top-1 -right-1 bg-brand-pink text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
@@ -124,7 +121,7 @@
         <section id="products" class="max-w-7xl mx-auto px-4 py-16 scroll-mt-20">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
-                    <h2 id="sectionTitle" class="text-3xl font-extrabold text-gray-900">جميع منتجات المتجر السحابية</h2>
+                    <h2 id="sectionTitle" class="text-3xl font-extrabold text-gray-900">جميع منتجات المتجر</h2>
                     <p class="text-gray-500 mt-1">تصفحي القطع المتاحة المحدثة فوراً</p>
                 </div>
                 <div class="flex flex-wrap gap-2" id="filterContainer">
@@ -165,7 +162,7 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
-                            <span>تحديد قيمة ومصاريف الشحن يتم بواسطة شركة التوصيل بناءً على <b>المدينة والمحافظة ومكان الاستلاستلام</b>.</span>
+                            <span>تحديد قيمة ومصاريف الشحن يتم بواسطة شركة التوصيل بناءً على <b>المدينة والمحافظة ومكان الاستلام</b>.</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-brand-pink mt-1"></i>
@@ -353,10 +350,16 @@
                         rating: 4.9
                     });
                 });
+
+                if (products.length === 0) {
+                    document.getElementById('productsGrid').innerHTML = `<p class="text-gray-500 text-center col-span-full py-12 text-base">لا توجد منتجات مضافة في السحابة حالياً. استخدم لوحة التحكم لرفع أول منتج!</p>`;
+                    return;
+                }
+
                 renderProducts();
             } catch (err) {
-                console.error(err);
-                document.getElementById('productsGrid').innerHTML = `<p class="text-red-500 text-center col-span-full py-10">حدث خطأ أثناء تحميل المنتجات من السحابة.</p>`;
+                console.error("Firebase Error:", err);
+                document.getElementById('productsGrid').innerHTML = `<p class="text-red-500 text-center col-span-full py-10 font-bold">خطأ في الاتصال بقاعدة البيانات. تأكد من فتح Rules في فايربيس.</p>`;
             }
         }
 
@@ -379,7 +382,7 @@
                 filtered = products.filter(p => p.stock > 0);
                 titleElem.textContent = "المنتجات المتاحة للتسليم الفوري فقط";
             } else {
-                titleElem.textContent = "جميع منتجات المتجر السحابية";
+                titleElem.textContent = "جميع منتجات المتجر";
             }
 
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -497,4 +500,74 @@
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             const subTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-            if(cartCount) cartCount
+            if(cartCount) cartCount.textContent = totalItems;
+            if(cartTotal) cartTotal.textContent = `${subTotal} ج.م`;
+
+            if (cartItems) {
+                if (cart.length === 0) {
+                    cartItems.innerHTML = `<p class="text-center text-gray-500 py-8">سلة الشراء فارغة حالياً.</p>`;
+                } else {
+                    cartItems.innerHTML = cart.map(item => `
+                        <div class="flex items-center justify-between py-3">
+                            <div class="flex items-center gap-3">
+                                <img src="${item.image}" class="w-12 h-12 object-cover rounded" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&auto=format&fit=crop&q=80';">
+                                <div>
+                                    <h4 class="font-bold text-sm">${item.name}</h4>
+                                    <p class="text-xs text-brand-pink font-bold">${item.price} ج.م</p>
+                                    ${item.isPreOrder ? '<span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded mt-1">حجز مسبق</span>' : '<span class="inline-block bg-green-100 text-green-800 text-[10px] font-bold px-1.5 py-0.5 rounded mt-1">تسليم فوري</span>'}
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+                                    <button type="button" onclick="changeQuantity('${item.id}', -1)" class="px-2.5 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">-</button>
+                                    <span class="px-3 text-xs font-bold">${item.quantity}</span>
+                                    <button type="button" onclick="changeQuantity('${item.id}', 1)" class="px-2.5 py-1 bg-gray-200 hover:bg-gray-300 font-bold text-xs">+</button>
+                                </div>
+                                <button onclick="removeFromCart('${item.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        };
+
+        window.checkoutWhatsApp = function() {
+            if (cart.length === 0) {
+                alert('سلة الشراء فارغة!');
+                return;
+            }
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const city = document.getElementById('customerCity').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+
+            if (!name || !phone || !city || !address) {
+                alert('الرجاء إكمال جميع بيانات الشحن (الاسم، الهاتف، المدينة، العنوان).');
+                return;
+            }
+
+            let message = `🛒 *طلب جديد من متجر Carmela Online*\n\n`;
+            message += `👤 *الاسم:* ${name}\n`;
+            message += `📞 *الهاتف:* ${phone}\n`;
+            message += `📍 *المدينة:* ${city}\n`;
+            message += `🏠 *العنوان:* ${address}\n\n`;
+            message += `📦 *المنتجات المطلوبة:*\n`;
+
+            cart.forEach((item, index) => {
+                message += `${index + 1}. ${item.name} (${item.quantity} قطعة) - ${item.price * item.quantity} ج.م\n`;
+            });
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            message += `\n💰 *إجمالي المنتجات:* ${total} ج.م\n`;
+            message += `🚚 *ملاحظة:* مصاريف الشحن تحددها شركة البحر الأحمر للشحن عند التوصيل.\n`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/201000000000?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        };
+
+        fetchProductsFromCloud();
+    </script>
+</body>
+</html>
