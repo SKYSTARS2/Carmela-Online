@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم | CARMELA ONLINE</title>
+    <title>لوحة التحكم السحابية | CARMELA ONLINE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,26 +12,13 @@
 <body class="bg-gray-100 min-h-screen p-4 sm:p-8">
     <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
         <div class="flex justify-between items-center border-b pb-4 mb-6">
-            <h1 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-sliders text-pink-600 ml-2"></i> لوحة تحكم متجر كارميلا أونلاين</h1>
+            <h1 class="text-2xl font-black text-slate-800"><i class="fa-solid fa-cloud-arrow-up text-pink-600 ml-2"></i> لوحة تحكم كارميلا (السحابية المباشرة)</h1>
             <a href="index.html" target="_blank" class="bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-slate-700">عرض المتجر <i class="fa-solid fa-external-link-alt mr-1"></i></a>
         </div>
 
-        <!-- إعدادات الربط وحفظ التوكن -->
-        <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6 space-y-3">
-            <h3 class="font-bold text-blue-900 text-sm"><i class="fa-solid fa-key ml-1"></i> حفظ إعدادات الربط مع GitHub:</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <input type="text" id="ghUser" placeholder="اسم المستخدم (skystars2)" class="border rounded-lg p-2 text-xs bg-white">
-                <input type="password" id="ghToken" placeholder="رمز الأمان GitHub Token (ghp_...)" class="border rounded-lg p-2 text-xs bg-white">
-                <button onclick="saveCredentials()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-2 rounded-lg text-xs">
-                    حفظ الـ Token واستمرار 💾
-                </button>
-            </div>
-            <p id="credStatus" class="text-[11px] font-bold text-blue-700">اكتب التوكن وواضغط "حفظ" ليتم اعتماده دائماً.</p>
-        </div>
-
         <!-- Add Product Form -->
-        <form id="productForm" onsubmit="saveProduct(event)" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4">
-            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد (رفع مباشر للصورة)</h2>
+        <form id="productForm" onsubmit="saveProductToCloud(event)" class="bg-pink-50 border border-pink-100 p-5 rounded-xl mb-8 space-y-4">
+            <h2 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-circle-plus text-pink-600 ml-1"></i> إضافة منتج جديد (يظهر للجميع فوراً)</h2>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -58,234 +45,143 @@
 
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">صورة المنتج (اختر صورة من جهازك) *</label>
-                <input type="file" id="pImageFile" accept="image/*" class="w-full border rounded-lg p-2 text-sm bg-white">
+                <input type="file" id="pImageFile" accept="image/*" required class="w-full border rounded-lg p-2 text-sm bg-white">
             </div>
 
             <button type="submit" id="submitBtn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl transition-colors shadow">
-                حفظ ونشر التعديل للجميع فوراً 🚀
+                حفظ ونشر المنتج أونلاين للجميع 🚀
             </button>
         </form>
 
         <!-- Current Products List -->
         <div>
-            <h2 class="font-bold text-slate-800 text-lg mb-4">المنتجات الحالية في المتجر</h2>
+            <h2 class="font-bold text-slate-800 text-lg mb-4">المنتجات الحالية على السحابة</h2>
             <div id="adminProductsList" class="space-y-3">
-                <p class="text-gray-500 text-center py-4">جاري تحميل المنتجات...</p>
+                <p class="text-gray-500 text-center py-4">جاري تحميل المنتجات من السحابة...</p>
             </div>
         </div>
     </div>
 
-    <script>
-        const REPO_NAME = 'Carmela-Online';
-        let products = [];
-        let fileSha = '';
+    <!-- Firebase SDKs via CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('gh_user') || 'skystars2';
-            const savedToken = localStorage.getItem('gh_token') || '';
-            
-            document.getElementById('ghUser').value = savedUser;
-            document.getElementById('ghToken').value = savedToken;
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_2e4528OLsO5Y5VD-8LBfHQe6HZ3VotA",
+            authDomain: "carmela-online.firebaseapp.com",
+            projectId: "carmela-online",
+            storageBucket: "carmela-online.firebasestorage.app",
+            messagingSenderId: "336762136924",
+            appId: "1:336762136924:web:56ab68226a9b3e5fcb7999",
+            measurementId: "G-CD8EF175V2"
+        };
 
-            if(savedToken) {
-                document.getElementById('credStatus').textContent = "✅ تم تحميل التوكن المحفوظ بنجاح.";
-                document.getElementById('credStatus').className = "text-[11px] font-bold text-green-700";
-            }
-            
-            loadProductsFromGitHub();
-        });
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        function saveCredentials() {
-            const user = document.getElementById('ghUser').value.trim();
-            const token = document.getElementById('ghToken').value.trim();
-
-            if(!user || !token) {
-                alert('يرجى كتابة اسم المستخدم والـ Token أولاً!');
-                return;
-            }
-
-            localStorage.setItem('gh_user', user);
-            localStorage.setItem('gh_token', token);
-
-            document.getElementById('credStatus').textContent = "✅ تم حفظ التوكن بنجاح وسيعمل دائماً الآن!";
-            document.getElementById('credStatus').className = "text-[11px] font-bold text-green-700";
-            alert('تم حفظ الـ Token بنجاح!');
-            loadProductsFromGitHub();
-        }
-
-        async function loadProductsFromGitHub() {
-            const user = localStorage.getItem('gh_user') || document.getElementById('ghUser').value.trim() || 'skystars2';
+        window.loadProductsFromCloud = async function() {
+            const list = document.getElementById('adminProductsList');
             try {
-                const res = await fetch(`https://api.github.com/repos/${user}/${REPO_NAME}/contents/products.json`);
-                if(res.ok) {
-                    const data = await res.json();
-                    fileSha = data.sha;
-                    const decodedContent = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                    products = decodedContent;
-                    renderAdminList();
-                } else {
-                    products = [];
-                    renderAdminList();
+                const querySnapshot = await getDocs(collection(db, "products"));
+                let html = "";
+                if (querySnapshot.empty) {
+                    list.innerHTML = `<p class="text-gray-500 text-center py-4">لا توجد منتجات مسجلة حالياً.</p>`;
+                    return;
                 }
-            } catch(err) {
+                
+                querySnapshot.forEach((docSnap) => {
+                    const p = docSnap.data();
+                    html += `
+                        <div class="flex items-center justify-between bg-white border p-3 rounded-xl shadow-xs">
+                            <div class="flex items-center gap-3">
+                                <img src="${p.image}" class="w-14 h-14 object-cover rounded-lg border" onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&q=80'">
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-800">${p.name}</h4>
+                                    <p class="text-xs text-pink-600 font-bold">${p.price} ج.م | <span class="text-gray-500">${p.category}</span></p>
+                                </div>
+                            </div>
+                            <button onclick="deleteCloudProduct('${docSnap.id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-trash ml-1"></i> حذف
+                            </button>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } catch (err) {
                 console.error(err);
-                document.getElementById('adminProductsList').innerHTML = `<p class="text-red-500 text-center">تأكد من وجود ملف products.json في المستودع.</p>`;
+                list.innerHTML = `<p class="text-red-500 text-center">خطأ في الاتصال بقاعدة بيانات السحابة.</p>`;
             }
-        }
+        };
 
-        async function saveProductsToGitHub() {
-            const user = localStorage.getItem('gh_user') || document.getElementById('ghUser').value.trim();
-            const token = localStorage.getItem('gh_token') || document.getElementById('ghToken').value.trim();
-
-            if(!user || !token) {
-                alert('يرجى إدخال الـ Token والضغط على زر "حفظ الـ Token واستمرار" أولاً!');
-                return false;
-            }
-
+        window.saveProductToCloud = async function(e) {
+            e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = 'جاري رفع المنتج والصورة أونلاين... ⏳';
+            btn.textContent = 'جاري ضغط الصورة والرفع للسحابة... ⏳';
 
-            try {
-                const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
-                
-                const response = await fetch(`https://api.github.com/repos/${user}/${REPO_NAME}/contents/products.json`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: "Update products via Carmela Control Panel",
-                        content: contentEncoded,
-                        sha: fileSha
-                    })
-                });
-
-                if(response.ok) {
-                    const resData = await response.json();
-                    fileSha = resData.content.sha;
-                    alert('تم إضافة المنتج بنجاح ونشره للجميع على الموقع! 🚀');
-                    btn.disabled = false;
-                    btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
-                    return true;
-                } else {
-                    const errData = await response.json();
-                    alert('خطأ من جيت هاب: ' + errData.message);
-                    btn.disabled = false;
-                    btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
-                    return false;
-                }
-            } catch(err) {
-                alert('خطأ في الاتصال بالشبكة.');
-                btn.disabled = false;
-                btn.textContent = 'حفظ ونشر التعديل للجميع فوراً 🚀';
-                return false;
-            }
-        }
-
-        function renderAdminList() {
-            const list = document.getElementById('adminProductsList');
-            if(products.length === 0) {
-                list.innerHTML = `<p class="text-gray-500 text-center py-4">لا توجد منتجات مسجلة حالياً.</p>`;
-                return;
-            }
-
-            list.innerHTML = products.map(p => `
-                <div class="flex items-center justify-between bg-white border p-3 rounded-xl shadow-xs">
-                    <div class="flex items-center gap-3">
-                        <img src="${p.image}" class="w-14 h-14 object-cover rounded-lg border" onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&q=80'">
-                        <div>
-                            <h4 class="font-bold text-sm text-slate-800">${p.name}</h4>
-                            <p class="text-xs text-pink-600 font-bold">${p.price} ج.م | <span class="text-gray-500">${p.category}</span></p>
-                        </div>
-                    </div>
-                    <button onclick="deleteProduct(${p.id})" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
-                        <i class="fa-solid fa-trash ml-1"></i> حذف
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function compressAndConvertImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        const maxDim = 600; // تصغير الحجم للحفاظ على سرعة السيرفر
-
-                        if (width > height && width > maxDim) {
-                            height *= maxDim / width;
-                            width = maxDim;
-                        } else if (height > maxDim) {
-                            width *= maxDim / height;
-                            height = maxDim;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('canvas');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.7)); // ضغط الصورة لـ 70%
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function saveProduct(e) {
-            e.preventDefault();
             const name = document.getElementById('pName').value;
             const price = parseFloat(document.getElementById('pPrice').value);
             const category = document.getElementById('pCategory').value;
             const stock = parseInt(document.getElementById('pStock').value);
             const fileInput = document.getElementById('pImageFile');
 
-            let imageUrl = "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80";
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                // ضغط الصورة لتناسب قواعد البيانات بدون مشاكل حجم
+                const img = new Image();
+                img.onload = async function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 500;
+                    if (width > height && width > maxDim) {
+                        height *= maxDim / width;
+                        width = maxDim;
+                    } else if (height > maxDim) {
+                        width *= maxDim / height;
+                        height = maxDim;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedImage = canvas.toDataURL('image/jpeg', 0.6);
 
-            if (fileInput.files && fileInput.files[0]) {
-                imageUrl = await compressAndConvertImage(fileInput.files[0]);
-            }
-
-            await addProductObj(name, price, category, stock, imageUrl);
-        }
-
-        async function addProductObj(name, price, category, stock, image) {
-            const newProduct = {
-                id: Date.now(),
-                name, price, category, stock, image,
-                rating: 5.0
+                    try {
+                        await addDoc(collection(db, "products"), {
+                            name, price, category, stock,
+                            image: compressedImage,
+                            createdAt: Date.now()
+                        });
+                        alert('تم رفع ونشر المنتج للجميع بنجاح على السحابة! 🚀');
+                        document.getElementById('productForm').reset();
+                        loadProductsFromCloud();
+                    } catch (err) {
+                        alert('حدث خطأ أثناء الحفظ: ' + err.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = 'حفظ ونشر المنتج أونلاين للجميع 🚀';
+                    }
+                };
+                img.src = event.target.result;
             };
+            reader.readAsDataURL(fileInput.files[0]);
+        };
 
-            products.unshift(newProduct);
-            
-            const success = await saveProductsToGitHub();
-            if(success) {
-                document.getElementById('productForm').reset();
-                renderAdminList();
-            } else {
-                products.shift();
-            }
-        }
-
-        async function deleteProduct(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                const oldProducts = [...products];
-                products = products.filter(p => p.id !== id);
-                
-                const success = await saveProductsToGitHub();
-                if(success) {
-                    renderAdminList();
-                } else {
-                    products = oldProducts;
+        window.deleteCloudProduct = async function(id) {
+            if(confirm('هل أنت متأكد من حذف هذا المنتج نهائياً للجميع؟')) {
+                try {
+                    await deleteDoc(doc(db, "products", id));
+                    loadProductsFromCloud();
+                } catch(err) {
+                    alert('خطأ أثناء الحذف');
                 }
             }
-        }
+        };
+
+        // تحميل المنتجات عند فتح الصفحة
+        loadProductsFromCloud();
     </script>
 </body>
 </html>
