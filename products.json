@@ -1,0 +1,4 @@
+[
+  { "id": 1, "name": "فستان سهرة راقي أنيق", "category": "ملابس", "price": 650, "stock": 3, "image": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80", "rating": 4.9 },
+  { "id": 2, "name": "حقيبة يد جلدية فاخرة", "category": "إكسسوارات", "price": 290, "stock": 2, "image": "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=400&q=80", "rating": 4.9 }
+]
